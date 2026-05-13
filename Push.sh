@@ -21,7 +21,6 @@ echo "Repo:   $(git remote get-url origin)"
 echo "User:   $(git config user.name) <$(git config user.email)>"
 echo "Branch: $BRANCH"
 
-# FIX: 'set -e' temporär umgehen, falls der Branch-Wechsel eine Warnung wirft
 git switch "$BRANCH" 2>/dev/null || git switch -c "$BRANCH" || true
 
 git add .
@@ -29,7 +28,7 @@ if git diff --cached --quiet; then
     echo "Keine Änderungen zum Committen."
 else
     git commit -m "$(date '+%Y-%m-%d %H:%M:%S') - Featuress 1-5 + Bonus functional ==> GUI mit Differenzierungslogik (CEO sieht als einziger die Diagramm) & Abgabedoku und Code Kommentieren fehlt noch"
-fi 
+fi
 
 if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
     git pull origin "$BRANCH" --rebase
