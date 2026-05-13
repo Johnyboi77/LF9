@@ -22,6 +22,8 @@ Du baust **5 kleine Python-Programme**, die je eine Aufgabe lösen, plus **1 Hau
 | `02_print_SQL_Ausgabe` | `mariadb` | ✅ |
 | `03_DBinCSV` | `csv` | ✅ Python-Standard |
 | `04_DBausgabeFenster` | `tkinter` | ⚠️ **fehlt** – `sudo pacman -S tk` |
+
+**DB-GUI-Tool:** DBeaver (statt HeidiSQL) – `sudo pacman -S dbeaver`
 | `05_csv_to_xml` | `csv` + `xml.etree.ElementTree` | ✅ Python-Standard |
 
 ### ❌ Nicht erlaubt im Pflichtteil
@@ -50,13 +52,12 @@ import pandas as pd
 ### Schon erledigt ✅
 - VS Code
 - Python + `mariadb` Library + PySide6
-- HeidiSQL Wrapper (1:12.17)
 
 ### Noch offen – mach das zuerst:
 
 ```bash
-# 1. HeidiSQL-Client nachinstallieren (sonst startet das Programm nicht!)
-yay -S heidisql-qt6
+# 1. DBeaver installieren (offizielles Repo, zieht Java automatisch mit)
+sudo pacman -S dbeaver
 
 # 2. tkinter installieren (für Aufgabe 1.4)
 sudo pacman -S tk
@@ -76,8 +77,11 @@ sudo mariadb -u root -p
 > quit
 sudo mariadb -u root -p heiner < /pfad/zu/deiner.sql
 
-# 5. In HeidiSQL Verbindung anlegen:
-#    Host: 127.0.0.1, User: root, Passwort: <dein lokales>, DB: heiner, Port: 3306
+# 5. In DBeaver Verbindung anlegen:
+#    "New Database Connection" → MariaDB auswählen
+#    Beim ersten Mal: Driver-Download bestätigen
+#    Host: 127.0.0.1, Port: 3306, Database: heiner, User: root, Password: <dein lokales>
+#    "Test Connection" → muss grün werden, dann "Finish"
 ```
 
 > **Reihenfolge:** Erst lokal alles zum Laufen bringen, dann auf den Schul-Server umziehen. Das WLAN ist laut PDF unzuverlässig.
@@ -216,7 +220,7 @@ Zweites Dropdown zeigt nur die erlaubten Tools, Button "Ausführen" startet das 
 
 ## 6. Abgabe-Checkliste
 
-- [ ] HeidiSQL läuft (`heidisql-qt6` installiert)
+- [ ] DBeaver läuft und ist mit lokaler DB verbunden
 - [ ] tkinter funktioniert (`python -m tkinter`)
 - [ ] Lokale MariaDB läuft, DB `heiner` importiert
 - [ ] `config.py` mit lokalen Zugangsdaten erstellt
