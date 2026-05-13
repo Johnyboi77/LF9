@@ -1,3 +1,4 @@
 .env
 Push.sh
 CMD.md
+__pycache__/
