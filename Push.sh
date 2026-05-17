@@ -29,6 +29,8 @@ if git diff --cached --quiet; then
 else
     git commit -m "$(date '+%Y-%m-%d %H:%M:%S') - New Browser UI / Codevereinfachung & Kommentieren offen"
 
+fi
+
 if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
     git pull origin "$BRANCH" --rebase
 else
