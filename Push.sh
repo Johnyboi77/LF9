@@ -27,8 +27,7 @@ git add .
 if git diff --cached --quiet; then
     echo "Keine Änderungen zum Committen."
 else
-    git commit -m "$(date '+%Y-%m-%d %H:%M:%S') - Featuress 1-5 + Bonus functional ==> GUI mit Differenzierungslogik (CEO sieht als einziger die Diagramm) & Abgabedoku und Code Kommentieren fehlt noch"
-fi
+    git commit -m "$(date '+%Y-%m-%d %H:%M:%S') - New Browser UI / Codevereinfachung & Kommentieren offen"
 
 if git ls-remote --exit-code --heads origin "$BRANCH" > /dev/null 2>&1; then
     git pull origin "$BRANCH" --rebase

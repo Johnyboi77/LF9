@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Heiner IT-Systems – {{ abteilung }}</title>
+  <script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --sidebar-bg:  #243b55;
+      --header-bg:   #1e3a5f;
+      --active:      #2980b9;
+      --hover:       #34495e;
+      --body-bg:     #f0f2f5;
+      --white:       #ffffff;
+      --text:        #2c3e50;
+      --muted:       #95a5a6;
+      --success:     #27ae60;
+      --error:       #e74c3c;
+      --border:      #dce3ea;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+      background: var(--body-bg);
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ── Header ─────────────────────────────────────────────────────── */
+    header {
+      background: var(--header-bg);
+      color: #fff;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      flex-shrink: 0;
+    }
+
+    header .brand { font-size: 1.1rem; font-weight: 700; }
+    header .brand span { opacity: 0.5; margin-right: 8px; }
+
+    header .badge {
+      background: #2d5080;
+      padding: 5px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    /* ── Layout ─────────────────────────────────────────────────────── */
+    .layout {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── Sidebar ─────────────────────────────────────────────────────── */
+    nav {
+      width: 220px;
+      background: var(--sidebar-bg);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .nav-section {
+      padding: 14px 16px 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #4a6a8a;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    nav a {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 11px 20px;
+      color: #bdc3c7;
+      text-decoration: none;
+      font-size: 0.92rem;
+      border-left: 3px solid transparent;
+      transition: background 0.15s, color 0.15s;
+    }
+
+    nav a:hover { background: var(--hover); color: #fff; }
+
+    nav a.active {
+      background: var(--active);
+      color: #fff;
+      border-left-color: #fff;
+    }
+
+    .nav-spacer { flex: 1; }
+
+    .nav-divider {
+      border: none;
+      border-top: 1px solid #34495e;
+      margin: 8px 0;
+    }
+
+    .logout-btn {
+      margin: 12px;
+      padding: 10px;
+      background: #c0392b;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      text-decoration: none;
+      display: block;
+      transition: background 0.2s;
+    }
+
+    .logout-btn:hover { background: #e74c3c; }
+
+    /* ── Content ─────────────────────────────────────────────────────── */
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px 36px;
+    }
+
+    .page-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .page-sub {
+      color: var(--muted);
+      font-size: 0.9rem;
+      margin-bottom: 24px;
+    }
+
+    hr.divider {
+      border: none;
+      border-top: 1.5px solid var(--border);
+      margin-bottom: 28px;
+    }
+
+    /* ── Cards ───────────────────────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 24px 28px;
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--text);
+    }
+
+    /* ── Buttons ─────────────────────────────────────────────────────── */
+    .btn {
+      display: inline-block;
+      padding: 10px 22px;
+      background: var(--active);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      text-decoration: none;
+    }
+
+    .btn:hover { background: #1a6fa8; }
+
+    /* ── Status-Banner ───────────────────────────────────────────────── */
+    .status {
+      padding: 12px 18px;
+      border-radius: 6px;
+      margin-top: 16px;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .status.success { background: #eafaf1; color: var(--success); border: 1px solid #a9dfbf; }
+    .status.error   { background: #fdecea; color: var(--error);   border: 1px solid #f5c6cb; }
+
+    /* ── Tabelle ─────────────────────────────────────────────────────── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+    }
+
+    thead tr { background: #243b55; color: #fff; }
+    thead th { padding: 12px 16px; text-align: left; font-weight: 600; white-space: nowrap; }
+
+    tbody tr:nth-child(even) { background: #f8f9fa; }
+    tbody tr:hover           { background: #e8f4fd; }
+    tbody td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+
+    .row-count { color: var(--muted); font-size: 0.82rem; margin-top: 8px; }
+
+    /* ── Dashboard-Karten (Feature-Übersicht) ────────────────────────── */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .feature-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 22px 24px;
+    }
+
+    .feature-card .icon { font-size: 2rem; margin-bottom: 10px; }
+    .feature-card .name { font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+    .feature-card .desc { font-size: 0.85rem; color: var(--muted); margin-bottom: 10px; }
+    .feature-card .badge-ok   { color: var(--success); font-size: 0.82rem; font-weight: 700; }
+    .feature-card .badge-none { color: #bdc3c7;        font-size: 0.82rem; font-weight: 700; }
+
+    /* ── DB-Detail-Tabelle ───────────────────────────────────────────── */
+    .detail-grid {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 8px 0;
+      font-size: 0.95rem;
+    }
+
+    .detail-grid .key   { color: var(--muted); }
+    .detail-grid .val   { font-weight: 600; }
+
+    /* ── Charts ──────────────────────────────────────────────────────── */
+    .chart-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 0;
+      border-bottom: 2px solid var(--border);
+    }
+
+    .chart-tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      transition: color 0.15s;
+    }
+
+    .chart-tab.active { color: var(--active); border-bottom: 2px solid var(--active); margin-bottom: -2px; }
+    .chart-tab:hover:not(.active) { color: var(--text); }
+
+    .chart-panel { display: none; padding-top: 20px; }
+    .chart-panel.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ──────────────────────────────────────────────────────────── -->
+<header>
+  <div class="brand"><span>▸</span> Heiner IT-Systems GmbH</div>
+  <div class="badge">👤 {{ abteilung }}</div>
+</header>
+
+<div class="layout">
+
+  <!-- ── Sidebar ─────────────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-section">Navigation</div>
+    <a href="/dashboard"  class="{{ 'active' if page=='dashboard' else '' }}">&nbsp;Dashboard</a>
+    <a href="/feature/1"  class="{{ 'active' if page=='f1' else '' }}">&nbsp;Verbindung</a>
+
+    <hr class="nav-divider">
+    <div class="nav-section">Features</div>
+
+    {% if 'f2' in erlaubt %}
+    <a href="/feature/2" class="{{ 'active' if page=='f2' else '' }}">&nbsp;SQL ausgeben</a>
+    {% endif %}
+    {% if 'f3' in erlaubt %}
+    <a href="/feature/3" class="{{ 'active' if page=='f3' else '' }}">&nbsp;SQL → CSV</a>
+    {% endif %}
+    {% if 'f4' in erlaubt %}
+    <a href="/feature/4" class="{{ 'active' if page=='f4' else '' }}">&nbsp;DB-Tabelle</a>
+    {% endif %}
+    {% if 'f5' in erlaubt %}
+    <a href="/feature/5" class="{{ 'active' if page=='f5' else '' }}">&nbsp;CSV → XML</a>
+    {% endif %}
+
+    <div class="nav-spacer"></div>
+    <hr class="nav-divider">
+    <a href="/logout" class="logout-btn">⏻&nbsp; Abmelden</a>
+  </nav>
+
+  <!-- ── Content ─────────────────────────────────────────────────────── -->
+  <main>
+
+    {# ── DASHBOARD ─────────────────────────────────────────────────── #}
+    {% if page == 'dashboard' %}
+      <div class="page-title">Dashboard</div>
+      <div class="page-sub">Willkommen zurück — Abteilung {{ abteilung }}</div>
+      <hr class="divider">
+
+      {% if abteilung == 'Geschäftsführung' %}
+        <!-- Charts für CEO -->
+        <div class="card">
+          <div class="chart-tabs">
+            <button class="chart-tab active" onclick="showTab('kunden',this)">🥧 Top Kunden</button>
+            <button class="chart-tab" onclick="showTab('monat',this)">📈 Monatsumsatz</button>
+            <button class="chart-tab" onclick="showTab('artikel',this)">🏆 Top 10 Artikel</button>
+          </div>
+          <div id="tab-kunden"  class="chart-panel active"><div id="chart-kunden"  style="height:420px"></div></div>
+          <div id="tab-monat"   class="chart-panel">       <div id="chart-monat"   style="height:420px"></div></div>
+          <div id="tab-artikel" class="chart-panel">       <div id="chart-artikel" style="height:420px"></div></div>
+        </div>
+      {% else %}
+        <!-- Feature-Übersicht für andere Abteilungen -->
+        {% set feature_infos = [
+          ('f2','','SQL ausgeben','Mitarbeiterdaten (personal) anzeigen'),
+          ('f3','','SQL → CSV','Artikel-Tabelle als CSV exportieren'),
+          ('f4','','DB-Tabelle','Kundendaten in der Tabelle anzeigen'),
+          ('f5','','CSV → XML','artikel.csv in artikel.xml konvertieren'),
+        ] %}
+        <div class="feature-grid">
+          {% for fkey, icon, name, desc in feature_infos %}
+          <div class="feature-card">
+            <div class="icon">{{ icon }}</div>
+            <div class="name" style="color:{{ '#27ae60' if fkey in erlaubt else '#bdc3c7' }}">{{ name }}</div>
+            <div class="desc">{{ desc }}</div>
+            {% if fkey in erlaubt %}
+              <div class="badge-ok">✓ Zugriff erlaubt</div>
+            {% else %}
+              <div class="badge-none">✗ Kein Zugriff</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+        <div class="card" style="color:var(--muted); font-size:0.9rem;">
+          Feature 1 (Verbindung testen) ist für alle Abteilungen verfügbar.
+        </div>
+      {% endif %}
+
+    {# ── FEATURE 1 ─────────────────────────────────────────────────── #}
+    {% elif page == 'f1' %}
+      <div class="page-title">Feature 1: Verbindung testen</div>
+      <div class="page-sub">Sendet einen Ping-Befehl an den MariaDB-Server</div>
+      <hr class="divider">
+
+      <div class="card">
+        <form method="POST">
+          <button type="submit" class="btn">Verbindung testen</button>
+        </form>
+        {% if status %}
+          <div class="status {{ status[0] }}">{{ status[1] }}</div>
+        {% endif %}
+      </div>
+
+      <div class="card">
+        <div class="card-title">Verbindungsdetails</div>
+        <div class="detail-grid">
+          <span class="key">Host</span>       <span class="val">{{ db.host }}</span>
+          <span class="key">Port</span>       <span class="val">{{ db.port }}</span>
+          <span class="key">Datenbank</span>  <span class="val">{{ db.database }}</span>
+          <span class="key">Benutzer</span>   <span class="val">{{ db.user }}</span>
+        </div>
+      </div>
+
+    {# ── FEATURE 2 ─────────────────────────────────────────────────── #}
+    {% elif page == 'f2' %}
+      <div class="page-title">Feature 2: SQL ausgeben</div>
+      <div class="page-sub">SELECT * FROM personal — alle Mitarbeiter</div>
+      <hr class="divider">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+          <tbody>{% for r in rows %}<tr>{% for v in r %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+        </table>
+      </div>
+      <div class="row-count">{{ rows|length }} Datensätze</div>
+
+    {# ── FEATURE 3 ─────────────────────────────────────────────────── #}
+    {% elif page == 'f3' %}
+      <div class="page-title">Feature 3: SQL → CSV</div>
+      <div class="page-sub">Exportiert die Tabelle artikel als artikel.csv (Semikolon-getrennt)</div>
+      <hr class="divider">
+      <div class="card">
+        <form method="POST">
+          <button type="submit" class="btn">CSV exportieren</button>
+        </form>
+        {% if status %}
+          <div class="status {{ status[0] }}">{{ status[1] }}</div>
+        {% endif %}
+      </div>
+
+    {# ── FEATURE 4 ─────────────────────────────────────────────────── #}
+    {% elif page == 'f4' %}
+      <div class="page-title">Feature 4: DB-Tabelle anzeigen</div>
+      <div class="page-sub">SELECT KundenCode, Firma, Kontaktperson, Ort, Land FROM kunde</div>
+      <hr class="divider">
+      <div class="table-wrap">
+        <table>
+          <thead><tr>{% for c in cols %}<th>{{ c }}</th>{% endfor %}</tr></thead>
+          <tbody>{% for r in rows %}<tr>{% for v in r %}<td>{{ v }}</td>{% endfor %}</tr>{% endfor %}</tbody>
+        </table>
+      </div>
+      <div class="row-count">{{ rows|length }} Datensätze</div>
+
+    {# ── FEATURE 5 ─────────────────────────────────────────────────── #}
+    {% elif page == 'f5' %}
+      <div class="page-title">Feature 5: CSV → XML</div>
+      <div class="page-sub">Wandelt artikel.csv in artikel.xml um (zuerst Feature 3 ausführen)</div>
+      <hr class="divider">
+      <div class="card">
+        <form method="POST">
+          <button type="submit" class="btn">XML konvertieren</button>
+        </form>
+        {% if status %}
+          <div class="status {{ status[0] }}">{{ status[1] }}</div>
+        {% endif %}
+      </div>
+
+    {% endif %}
+  </main>
+</div>
+
+<!-- ── Chart-Logik (nur auf Dashboard) ──────────────────────────────────── -->
+{% if page == 'dashboard' and abteilung == 'Geschäftsführung' %}
+<script>
+  // Farben passend zum UI-Design
+  const BLAU  = '#2980b9';
+  const GRUEN = '#27ae60';
+  const PIE_COLORS = ['#2980b9','#27ae60','#e67e22','#8e44ad','#e74c3c','#95a5a6'];
+
+  // Tab-Wechsel
+  function showTab(name, btn) {
+    document.querySelectorAll('.chart-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.chart-tab').forEach(b  => b.classList.remove('active'));
+    document.getElementById('tab-' + name).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  const layout = {
+    paper_bgcolor: '#fff', plot_bgcolor: '#fff',
+    margin: { t: 40, b: 60, l: 60, r: 20 },
+    font: { family: '-apple-system, BlinkMacSystemFont, "Segoe UI", Arial', size: 13 }
+  };
+
+  // Kunden-Donut
+  fetch('/api/kunden').then(r => r.json()).then(d => {
+    Plotly.newPlot('chart-kunden', [{
+      type: 'pie', labels: d.namen, values: d.werte,
+      hole: 0.4, marker: { colors: PIE_COLORS },
+      textinfo: 'label+percent',
+      hovertemplate: '%{label}<br>€%{value:,.0f}<extra></extra>'
+    }], { ...layout, title: { text: 'Top 5 Kunden nach Umsatz', font: { size: 15 } } });
+  });
+
+  // Monatsumsatz-Balken
+  fetch('/api/monat').then(r => r.json()).then(d => {
+    Plotly.newPlot('chart-monat', [{
+      type: 'bar', x: d.monate, y: d.umsaetze,
+      marker: { color: BLAU },
+      hovertemplate: '%{x}<br>€%{y:,.0f}<extra></extra>',
+      text: d.umsaetze.map(v => '€' + v.toLocaleString('de-DE', {maximumFractionDigits:0})),
+      textposition: 'outside'
+    }], { ...layout, title: { text: 'Gesamtumsatz pro Monat', font: { size: 15 } },
+          xaxis: { title: 'Monat' }, yaxis: { title: 'Umsatz (€)' } });
+  });
+
+  // Top-Artikel horizontaler Balken
+  fetch('/api/artikel').then(r => r.json()).then(d => {
+    Plotly.newPlot('chart-artikel', [{
+      type: 'bar', orientation: 'h',
+      x: d.umsaetze, y: d.artikel,
+      marker: { color: GRUEN },
+      hovertemplate: '%{y}<br>€%{x:,.0f}<extra></extra>',
+      text: d.umsaetze.map(v => '€' + v.toLocaleString('de-DE', {maximumFractionDigits:0})),
+      textposition: 'outside'
+    }], { ...layout, title: { text: 'Top 10 Artikel nach Umsatz', font: { size: 15 } },
+          xaxis: { title: 'Umsatz (€)' }, yaxis: { autorange: 'reversed' } });
+  });
+</script>
+{% endif %}
+
+</body>
+</html>

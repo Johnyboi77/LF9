@@ -1,5 +1,10 @@
 ### Übersicht
 
+DB in DBeaver Community 
 
+To DO:
 
-
+1. Check DBeaver Connection -> Env variabel & Übergabe fehlen & Fehler beheben
+2. Csv und XML Export im Browser file erstellen und direkt downloaden statt hier im projekt eine neue anzulegen --> Wenn hier file getestet wird, hier im Repo LF9 generieren, im Browser nur im Browser und keine ablage in LF9 Repo
+3. Code vereinfachen & Zeile für Zeile erklären (muss Codegerüst verwendet werden?)
+4. Readme aktualisieren (Begründungen der ges Umsatz, warum wie wo was etc und) und aufräumen (files) 
