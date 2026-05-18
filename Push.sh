@@ -27,7 +27,7 @@ git add .
 if git diff --cached --quiet; then
     echo "Keine Änderungen zum Committen."
 else
-    git commit -m "$(date '+%Y-%m-%d %H:%M:%S') - New Browser UI / Codevereinfachung & Kommentieren offen"
+    git commit -m "$(date '+%Y-%m-%d %H:%M:%S') - Kleine Anpassungen"
 
 fi
 

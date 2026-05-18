@@ -1,19 +1,22 @@
 ##### Daten als CSV bereitstellen #####
 # 03_DBinCSV.py
-### BIBs ###
-import mariadb                              # GEÄNDERT: war mysql.connector (Bug im Gerüst)
-import csv                                  # CSV-Modul aus Python-Standardbibliothek
-from config import DB_LOCAL                 # Zentrale DB-Zugangsdaten
+# Autor: Johny | Datum: 2026-05-18
+# Zweck: Tabelle artikel aus der DB als CSV-Datei exportieren
+# Bibliothek: mariadb (pip install mariadb) | csv (Python-Standard)
+# Hinweis: Codegerüst hatte mysql.connector – wurde auf mariadb korrigiert
 
-# MySQL Verbindung zur DB herstellen
+import mariadb                              # MariaDB-Bibliothek für DB-Zugriff
+import csv                                  # CSV-Modul aus Python-Standardbibliothek
+from config import DB_LOCAL                 # Zugangsdaten aus zentraler Config
+
+# Verbindungsaufbau mit Fehlerabfang
 try:                                        # Fehlerbehandlung für Verbindungsaufbau
     db = mariadb.connect(**DB_LOCAL)        # Verbindung über Daten aus config.py
 except mariadb.Error as fehler:             # Bei Verbindungs-Fehler:
     db = None                               # db auf None setzen
     print(f"Verbindung fehlgeschlagen: {fehler}")  # Fehlertext ausgeben
 
-# Name der zu exportierenden Tabelle (laut Aufgabe: Lagerbestand = artikel)
-tabelle = "artikel"                         # String mit dem Tabellennamen
+tabelle = "artikel"                         # Name der zu exportierenden Tabelle (Lagerbestand)
 
 # Exportiert eine komplette Tabelle als CSV-Datei (Dateiname = Tabellenname.csv)
 def tabelle_to_csv(tabellec, dbs):          # tabellec=Tabellenname, dbs=DB-Verbindung
@@ -31,7 +34,7 @@ def tabelle_to_csv(tabellec, dbs):          # tabellec=Tabellenname, dbs=DB-Verb
             writer.writerow(spalten)        # Erste Zeile: Spaltenüberschriften
             writer.writerows(daten)         # Alle Datenzeilen darunter schreiben
         print(f"{len(daten)} Zeilen in {tabellec}.csv geschrieben")  # Erfolgsmeldung
-    finally:                                # Egal ob Erfolg oder Fehler:
-        cur.close()                         # Cursor sauber schließen
+    finally:                                # Immer ausführen (auch bei Fehler):
+        cur.close()                         # Cursor schließen (Ressourcen freigeben)
 
-tabelle_to_csv(tabelle, db)                 # Aufruf mit Tabellenname + Verbindung
+tabelle_to_csv(tabelle, db)                 # Export ausführen

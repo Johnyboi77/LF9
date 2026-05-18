@@ -1,7 +1,11 @@
 ##### CSV-Datei in XML-Format umwandeln #####
 # 05_csv_to_xml.py
+# Autor: Johny | Datum: 2026-05-18
+# Zweck: artikel.csv (aus 03_DBinCSV.py) in artikel.xml konvertieren
+# Bibliothek: csv (Python-Standard) | xml.etree.ElementTree (Python-Standard)
+
 import csv                                  # CSV-Modul aus Python-Standardbibliothek
-import xml.etree.ElementTree as ET          # XML-Modul (ET = ElementTree, alias zur Lesbarkeit)
+import xml.etree.ElementTree as ET          # XML-Modul (ET = alias für ElementTree)
 
 # Wandelt eine CSV-Datei in ein XML-Dokument um
 def csv_to_xml(input_file, output_file):    # input_file = CSV, output_file = XML-Ziel
