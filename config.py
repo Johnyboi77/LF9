@@ -7,7 +7,7 @@ DB_LOCAL = {                       # Dictionary mit Verbindungsdaten
     "host": "localhost",           # MariaDB läuft auf dem gleichen Rechner
     "port": 3306,                  # Standard-Port für MariaDB/MySQL
     "user": "root",                # DB-Benutzer
-    "password": "root123",         # ⚠️ ANPASSEN an dein lokales Passwort
+    "password": "root123",         # lokales Passwort
     "database": "heiner"           # Name der importierten Datenbank
 }
 
