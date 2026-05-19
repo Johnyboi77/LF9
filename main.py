@@ -2,7 +2,7 @@
 # main.py
 # Autor: Johny | Datum: 2026-05-18
 # Zweck: Dropdown-Login mit RBAC + Tool-Auswahl (lt. Codegerüst Hr. Ullmann)
-# Start: python main.py  (oder python 21_dropdown.py)
+# Start: python main.py  (oder python3 21_dropdown.py)
 # Bibliothek: tkinter (sudo pacman -S tk)
 
 import tkinter as tk                               # Tkinter-Hauptmodul für GUI-Fenster

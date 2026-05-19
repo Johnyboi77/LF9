@@ -2,6 +2,8 @@
 # Bibliothek: keine zusätzliche - reine Datenhaltung
 # Verwendungszweck: Vermeidet doppelten Code (DRY-Prinzip)
 
+import mariadb # Import für echte Database in VM
+
 # Lokale Entwicklungs-Verbindung (auf eigenem Rechner)
 DB_LOCAL = {                       # Dictionary mit Verbindungsdaten
     "host": "localhost",           # MariaDB läuft auf dem gleichen Rechner
@@ -12,10 +14,9 @@ DB_LOCAL = {                       # Dictionary mit Verbindungsdaten
 }
 
 # Schul-Server-Verbindung (für Server-Umzug am Projektende)
-DB_SERVER = {                      # Wird später aktiviert
-    "host": "10.145.240.124",      # IP aus dem Lehrer-PDF
-    "port": 3306,
-    "user": "root",
-    "password": "kwW2iQBhRxtiLs",  # Aus dem Lehrer-PDF
-    "database": "heiner"
-}
+DB_SERVER = mariadb.connect (       # Wird später aktiviert
+    host="10.145.240.124",      # IP aus dem Lehrer-PDF
+    user="root",
+    password="passwort",
+    database="HeinerIT2025"
+)
