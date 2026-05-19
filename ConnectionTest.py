@@ -1,5 +1,5 @@
 ##### Verbindung zur Datenbank testen #####
-# 01_ConnectionTest.py
+# ConnectionTest.py
 # Autor: Johny | Datum: 2026-05-18
 # Zweck: Prüft ob die MariaDB-Verbindung steht (lt. Codegerüst Hr. Ullmann)
 # Bibliothek: mariadb (pip install mariadb)

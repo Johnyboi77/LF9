@@ -27,7 +27,7 @@ import csv                                                  # CSV in-memory schr
 import io                                                   # In-Memory-Streams (kein Dateisystem)
 import xml.etree.ElementTree as ET                          # XML aufbauen
 from config import DB_SERVER                                 # Zentrale Zugangsdaten (Schul-Server) aus Root
-from dropdownmenu import TOOLS_WEB as TOOLS                 # RBAC-Mapping (Abteilung → Feature-Keys) aus zentraler Konfiguration
+from dropdown import TOOLS_WEB as TOOLS, mitarbeiter_options       # RBAC-Mapping + Abteilungsliste aus zentraler Konfiguration
 
 app = Flask(__name__)                                       # Flask-App erstellen
 app.secret_key = "lf9_heiner_2026_browsergui"              # Schlüssel für Session-Verschlüsselung
@@ -91,7 +91,7 @@ def login():
             session["abteilung"] = abt                      # In Session speichern
             return redirect(url_for("dashboard"))           # → Dashboard
         fehler = "Bitte versuche es erneut"
-    return render_template("login.html", fehler=fehler)
+    return render_template("login.html", fehler=fehler, abteilungen=mitarbeiter_options)
 
 @app.route("/logout")
 def logout():

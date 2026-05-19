@@ -1,5 +1,5 @@
 ##### Datenbank-Tabelle im GUI-Fenster anzeigen #####
-# 04_DBausgabeFenster.py
+# DBausgabeFenster.py
 # Autor: Johny | Datum: 2026-05-18
 # Zweck: Tabelle kunde in einem Tkinter-Fenster als Tabelle anzeigen
 # Bibliothek: tkinter (sudo pacman -S tk) | mariadb (pip install mariadb)
@@ -12,7 +12,11 @@ from config import DB_SERVER                # Zugangsdaten (Schul-Server) aus ze
 SQL = "SELECT KundenCode, Firma, Kontaktperson, Ort, Land FROM kunde"  # Abzufragende Spalten
 
 def read_from_database():                   # Liest Spaltennamen und Daten aus der DB
-    db = mariadb.connect(**DB_SERVER)       # Verbindung aufbauen
+    try:                                    # Verbindungsaufbau mit Fehlerabfang
+        db = mariadb.connect(**DB_SERVER)   # Verbindung aufbauen
+    except mariadb.Error as fehler:         # Bei Verbindungsfehler:
+        print(f"Verbindung fehlgeschlagen: {fehler}")  # Fehler ausgeben
+        return [], []                       # Leere Listen zurückgeben (kein Absturz)
     cur = db.cursor()                       # Cursor zum SQL-Ausführen erzeugen
     cur.execute(SQL)                        # SQL-Befehl senden
     spalten = [s[0] for s in cur.description]  # Spaltennamen aus Cursor-Metadaten
@@ -22,6 +26,8 @@ def read_from_database():                   # Liest Spaltennamen und Daten aus d
 
 def darstellung_tabelle():                  # Baut das Tkinter-Fenster mit Tabelle auf
     spalten, daten = read_from_database()   # Daten aus DB holen
+    if not spalten:                         # Bei Verbindungsfehler: kein Fenster öffnen
+        return
     fenster = tk.Tk()                       # Hauptfenster erzeugen
     fenster.title("Kunden-Übersicht")       # Titel in der Titelleiste
     fenster.geometry("800x400")             # Fenstergröße (Breite x Höhe in Pixel)

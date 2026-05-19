@@ -1,5 +1,5 @@
 ##### Mitarbeiter aus der Datenbank ausgeben #####
-# 02_print_SQL_Ausgabe.py
+# print_SQL_Ausgabe.py
 # Autor: Johny | Datum: 2026-05-18
 # Zweck: Alle Einträge der Tabelle personal auf der Konsole ausgeben
 # Bibliothek: mariadb (pip install mariadb)
@@ -27,5 +27,6 @@ def testprint(dbc, sql_Anweisungc):         # dbc = Verbindung, sql_Anweisungc =
             print(zeile)                    # Zeile als Tupel ausgeben
     finally:                                # Immer ausführen (auch bei Fehler):
         cur.close()                         # Cursor schließen (Ressourcen freigeben)
+        dbc.close()                         # Verbindung schließen (Ressourcen freigeben)
 
 testprint(db, sql_Anweisung)                # Abfrage ausführen und Ergebnis ausgeben

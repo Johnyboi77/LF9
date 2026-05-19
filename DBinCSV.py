@@ -1,5 +1,5 @@
 ##### Daten als CSV bereitstellen #####
-# 03_DBinCSV.py
+# DBinCSV.py
 # Autor: Johny | Datum: 2026-05-18
 # Zweck: Tabelle artikel aus der DB als CSV-Datei exportieren
 # Bibliothek: mariadb (pip install mariadb) | csv (Python-Standard)
@@ -36,5 +36,6 @@ def tabelle_to_csv(tabellec, dbs):          # tabellec=Tabellenname, dbs=DB-Verb
         print(f"{len(daten)} Zeilen in {tabellec}.csv geschrieben")  # Erfolgsmeldung
     finally:                                # Immer ausführen (auch bei Fehler):
         cur.close()                         # Cursor schließen (Ressourcen freigeben)
+        dbs.close()                         # Verbindung schließen (Ressourcen freigeben)
 
 tabelle_to_csv(tabelle, db)                 # Export ausführen

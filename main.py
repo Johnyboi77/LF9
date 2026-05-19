@@ -2,14 +2,15 @@
 # main.py
 # Autor: Johny | Datum: 2026-05-18
 # Zweck: Dropdown-Login mit RBAC + Tool-Auswahl (lt. Codegerüst Hr. Ullmann)
-# Start: python main.py  (oder python3 21_dropdown.py)
+#        Dropdown-Logik (Abteilungen, TOOLS, Features) kommt aus dropdown.py (DRY)
+# Start: python main.py
 # Bibliothek: tkinter (sudo pacman -S tk)
 
 import tkinter as tk                               # Tkinter-Hauptmodul für GUI-Fenster
 from tkinter import ttk, messagebox, scrolledtext  # Widgets + Fehler-Dialoge + Textfeld
 import subprocess                                  # Startet andere Python-Dateien als Prozess
 import ast                                         # Sicheres Parsen von Python-Tupeln
-from dropdownmenu import (                         # Zentrale RBAC-Konfiguration (DRY)
+from dropdown import (                             # Zentrale RBAC-Konfiguration (DRY)
     mitarbeiter_options,                           # Abteilungsliste für Login-Dropdown
     TOOLS,                                         # Abteilung → erlaubte Skript-Dateien
     ALLE_FEATURES,                                 # Feature-Liste für Übersicht nach Login
@@ -71,7 +72,7 @@ def zeige_main(abt):
 
     tk.Label(feat_frame, text="FEATURES", bg=SIDE,
              fg="#4a6a8a", font=("Arial", 9, "bold")).pack(anchor="w", padx=16, pady=(14, 6))
-    for datei, name, beschr in ALLE_FEATURES:      # Jedes Feature anzeigen
+    for datei, name, _ in ALLE_FEATURES:             # Jedes Feature anzeigen
         freigesch = datei in erlaubt               # Freigeschaltet für diese Abteilung?
         symbol = "✓" if freigesch else "✗"
         farbe  = OK  if freigesch else MUT
@@ -86,10 +87,10 @@ def zeige_main(abt):
     frame_main.place(relx=0, rely=0,               # Task-Screen einblenden
                      relwidth=1, relheight=1)
 
-# Führt den Verbindungstest (01_ConnectionTest.py) aus und zeigt das Ergebnis
+# Führt den Verbindungstest (ConnectionTest.py) aus und zeigt das Ergebnis
 def verbindung_testen():
     result = subprocess.run(
-        ["python", "01_ConnectionTest.py"], capture_output=True, text=True)
+        ["python", "ConnectionTest.py"], capture_output=True, text=True)
     text = result.stdout or result.stderr or "(keine Ausgabe)"
     zeige_ausgabe(text, ausgabe)
 
@@ -98,16 +99,16 @@ def run_tool():
     datei = tool_var.get()                         # Dateiname aus Dropdown lesen
     if not datei:
         return
-    if datei in FENSTER_TOOLS:                     # 04: öffnet eigenes Fenster
+    if datei in FENSTER_TOOLS:                     # DBausgabeFenster: öffnet eigenes Fenster
         subprocess.Popen(["python", datei])        # Non-blocking starten
         zeige_ausgabe(f"▸ {datei} gestartet – Fenster öffnet sich separat\n", ausgabe)
-    else:                                          # 02/03/05: Textausgabe einfangen
+    else:                                          # Textausgabe einfangen und anzeigen
         result = subprocess.run(                   # Blockierend ausführen
             ["python", datei], capture_output=True, text=True)
         text = result.stdout or result.stderr or "(keine Ausgabe)"
         zeige_ausgabe(formatiere_ausgabe(text), ausgabe)  # Formatiert anzeigen
 
-# Formatiert Tupel-Ausgabe (z.B. von 02) als ASCII-Tabelle
+# Formatiert Tupel-Ausgabe (z.B. von print_SQL_Ausgabe) als ASCII-Tabelle
 def formatiere_ausgabe(text):
     zeilen = [z.strip() for z in text.strip().splitlines() if z.strip()]
     tupel = []
@@ -139,7 +140,7 @@ fenster.title("Heiner IT-Systems GmbH")
 fenster.configure(bg=HDR)
 fenster.attributes("-fullscreen", True)            # Vollbild beim Start
 fenster.bind("<Escape>",
-             lambda e: fenster.attributes("-fullscreen", False))  # ESC = kein Vollbild
+             lambda _: fenster.attributes("-fullscreen", False))  # ESC = kein Vollbild
 
 # ── SCREEN 1: Login ──────────────────────────────────────────────────────────────────
 frame_login = tk.Frame(fenster, bg=HDR)            # Hintergrund: dunkles Blau
@@ -175,7 +176,7 @@ tk.Button(card, text="✕   Beenden", bg=ERR, fg=CARD,
           font=("Arial", 11), relief="flat", width=30, pady=8,
           command=fenster.destroy).pack()
 
-pw_entry.bind("<Return>", lambda e: login())       # Enter = Login
+pw_entry.bind("<Return>", lambda _: login())       # Enter = Login
 
 # ── SCREEN 2: Task-Screen ────────────────────────────────────────────────────────────
 frame_main = tk.Frame(fenster, bg=BG)              # Inhaltsbereich: helles Grau

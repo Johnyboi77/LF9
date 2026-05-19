@@ -111,10 +111,9 @@
     <form method="POST">
       <label for="abteilung">Abteilung</label>
       <select id="abteilung" name="abteilung">
-        <option>Lager</option>
-        <option>Verwaltung</option>
-        <option>Marketing</option>
-        <option>Geschäftsführung</option>
+        {% for abt in abteilungen %}
+          <option>{{ abt }}</option>
+        {% endfor %}
       </select>
 
       <label for="passwort">Passwort</label>

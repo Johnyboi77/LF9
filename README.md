@@ -10,18 +10,18 @@ vereint in einem Login-Programm mit Rollen (RBAC).
 ```
 LF9/
 ├── config.py                  ← Datenbankzugangsdaten: DB_LOCAL (lokal) + DB_SERVER (Schul-Server)
-├── dropdownmenu.py            ← Zentrale RBAC-Konfiguration: Abteilungen, TOOLS, Feature-Mapping
-├── 01_ConnectionTest.py       ← Feature 1: DB-Verbindung testen
-├── 02_print_SQL_Ausgabe.py    ← Feature 2: Mitarbeiter in der Konsole ausgeben
-├── 03_DBinCSV.py              ← Feature 3: Artikel-Tabelle als CSV exportieren
-├── 04_DBausgabeFenster.py     ← Feature 4: Kunden-Tabelle als Tkinter-Fenster
-├── 05_csv_to_xml.py           ← Feature 5: artikel.csv → artikel.xml
-├── 21_dropdown.py             ← Hauptprogramm: Tkinter-Login mit Rollen + Tool-Auswahl
-├── main.py                    ← Dasselbe wie 21_dropdown.py (Scaffold-Alias)
+├── dropdown.py                ← Zentrale RBAC-Konfiguration: Abteilungen, TOOLS, Feature-Mapping
+│                                 (importiert von main.py und BrowserGUI/app.py)
+├── main.py                    ← Hauptprogramm: Tkinter-Login mit Rollen + Tool-Auswahl
+├── ConnectionTest.py          ← Feature 1: DB-Verbindung testen
+├── print_SQL_Ausgabe.py       ← Feature 2: Mitarbeiter in der Konsole ausgeben
+├── DBinCSV.py                 ← Feature 3: Artikel-Tabelle als CSV exportieren
+├── DBausgabeFenster.py        ← Feature 4: Kunden-Tabelle als Tkinter-Fenster
+├── csv_to_xml.py              ← Feature 5: artikel.csv → artikel.xml
 ├── BrowserGUI/                ← Bonus: Browser-Darstellung (Flask)
 │   ├── app.py                 ← Flask-Webserver mit Login, RBAC, Downloads, Charts
 │   └── templates/
-│       ├── login.html         ← Login-Seite
+│       ├── login.html         ← Login-Seite (Dropdown aus dropdown.py)
 │       └── app.html           ← Haupt-App (Features + CEO-Diagramme)
 └── Datenbank/
     └── HeinerIT2025.sql       ← SQL-Dump zum Importieren
@@ -34,7 +34,7 @@ LF9/
 ### 1. Voraussetzungen installieren
 
 ```bash
-# tkinter (für 04_DBausgabeFenster.py und 21_dropdown.py)
+# tkinter (für DBausgabeFenster.py und main.py)
 sudo pacman -S tk
 
 # MariaDB Python-Treiber
@@ -87,14 +87,14 @@ DB_LOCAL = {
 ### Einzelne Pflicht-Dateien (direkt ausführbar)
 
 ```bash
-python 01_ConnectionTest.py       # → "successful" wenn DB erreichbar
-python 02_print_SQL_Ausgabe.py    # → Mitarbeiterliste in der Konsole
-python 03_DBinCSV.py              # → erstellt artikel.csv im Projektordner
-python 04_DBausgabeFenster.py     # → Tkinter-Fenster mit Kunden-Tabelle
-python 05_csv_to_xml.py           # → liest artikel.csv, erstellt artikel.xml
+python ConnectionTest.py          # → "successful" wenn DB erreichbar
+python print_SQL_Ausgabe.py       # → Mitarbeiterliste in der Konsole
+python DBinCSV.py                 # → erstellt artikel.csv im Projektordner
+python DBausgabeFenster.py        # → Tkinter-Fenster mit Kunden-Tabelle
+python csv_to_xml.py              # → liest artikel.csv, erstellt artikel.xml
 ```
 
-> `05_csv_to_xml.py` setzt voraus, dass `03_DBinCSV.py` vorher gelaufen ist.
+> `csv_to_xml.py` setzt voraus, dass `DBinCSV.py` vorher gelaufen ist.
 
 ---
 
@@ -110,7 +110,7 @@ python3 main.py
 - SQL-Ausgabe wird tabellarisch formatiert (nicht als rohe Tupel)
 - Roter „Abmelden"-Button führt zurück zum Login-Screen
 - ESC: Vollbild verlassen
-- `python 21_dropdown.py` startet dasselbe (Scaffold-Datei des Lehrers)
+- RBAC-Konfiguration (Abteilungen, Features, Zugriffsrechte) lebt in `dropdown.py`
 
 ### Option 2 – Browser-GUI (Bonus)
 
@@ -159,10 +159,10 @@ Das Passwort ist immer gleich dem Abteilungsnamen (lt. Aufgabenstellung).
 
 | Datei | Bibliothek | Zweck |
 |---|---|---|
-| `01` – `04` | `mariadb` | Verbindung zur MariaDB-Datenbank |
-| `03` | `csv` | Tabellendaten als CSV-Datei schreiben |
-| `04`, `21_dropdown` | `tkinter` / `ttk` | GUI-Fenster und Widgets |
-| `05` | `csv`, `xml.etree.ElementTree` | CSV lesen, XML-Datei erzeugen |
+| `ConnectionTest` – `DBausgabeFenster` | `mariadb` | Verbindung zur MariaDB-Datenbank |
+| `DBinCSV` | `csv` | Tabellendaten als CSV-Datei schreiben |
+| `DBausgabeFenster`, `main` | `tkinter` / `ttk` | GUI-Fenster und Widgets |
+| `csv_to_xml` | `csv`, `xml.etree.ElementTree` | CSV lesen, XML-Datei erzeugen |
 
 ### Bonus (zusätzlich dokumentiert, frei wählbar)
 
@@ -175,9 +175,9 @@ Das Passwort ist immer gleich dem Abteilungsnamen (lt. Aufgabenstellung).
 
 ## Zwei Varianten im Vergleich
 
-| | Tkinter (`21_dropdown.py`) | Browser (`BrowserGUI/app.py`) |
+| | Tkinter (`main.py`) | Browser (`BrowserGUI/app.py`) |
 |---|---|---|
-| Start | `python 21_dropdown.py` | `python BrowserGUI/app.py` |
+| Start | `python main.py` | `python BrowserGUI/app.py` |
 | Oberfläche | Desktop-Fenster (Vollbild) | Webbrowser |
 | CSV-Export | Datei wird im Projektordner gespeichert | Download direkt im Browser |
 | XML-Export | Setzt CSV-Datei voraus | Direkt aus DB, kein Zwischenschritt |
