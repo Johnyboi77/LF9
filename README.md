@@ -3,11 +3,8 @@
 Schulprojekt: Daten aus einer MariaDB-Datenbank holen und in verschiedenen Formaten ausgeben –
 vereint in einem Login-Programm mit Rollen (RBAC).
 
----
-
 ## Projektstruktur
 
-```
 LF9/
 ├── config.py                  ← Datenbankzugangsdaten: DB_LOCAL (lokal) + DB_SERVER (Schul-Server)
 ├── dropdown.py                ← Zentrale RBAC-Konfiguration: Abteilungen, TOOLS, Feature-Mapping
@@ -25,84 +22,23 @@ LF9/
 │       └── app.html           ← Haupt-App (Features + CEO-Diagramme)
 └── Datenbank/
     └── HeinerIT2025.sql       ← SQL-Dump zum Importieren
-```
-
----
-
-## Setup
-
-### 1. Voraussetzungen installieren
-
-```bash
-# tkinter (für DBausgabeFenster.py und main.py)
-sudo pacman -S tk
-
-# MariaDB Python-Treiber
-pip install mariadb
-
-# Flask (nur für den Browser-Bonus)
-pip install flask
-```
-
-### 2. MariaDB starten und Datenbank importieren
-
-```bash
-# MariaDB-Dienst starten
-sudo systemctl start mariadb
-
-# Datenbank importieren (einmalig)
-sudo mariadb -u root -p heiner < Datenbank/HeinerIT2025.sql
-```
-
-### 3. Zugangsdaten prüfen
-
-In [config.py](config.py) sind zwei Verbindungsprofile hinterlegt:
-
-**`DB_SERVER`** – aktiv, wird von allen Dateien verwendet:
-```python
-DB_SERVER = {
-    "host":     "10.145.240.124",  # IP des Schul-Servers (aus Lehrer-PDF)
-    "port":     3306,
-    "user":     "root",
-    "password": "passwort",        # ← ggf. anpassen
-    "database": "HeinerIT2025"
-}
-```
-
-**`DB_LOCAL`** – nur als Fallback für lokale Entwicklung:
-```python
-DB_LOCAL = {
-    "host": "localhost",
-    "port": 3306,
-    "user": "root",
-    "password": "root123",         # ← bei lokaler Nutzung anpassen
-    "database": "heiner"
-}
-```
-
----
-
-## Starten
 
 ### Einzelne Pflicht-Dateien (direkt ausführbar)
 
-```bash
 python ConnectionTest.py          # → "successful" wenn DB erreichbar
 python print_SQL_Ausgabe.py       # → Mitarbeiterliste in der Konsole
 python DBinCSV.py                 # → erstellt artikel.csv im Projektordner
 python DBausgabeFenster.py        # → Tkinter-Fenster mit Kunden-Tabelle
 python csv_to_xml.py              # → liest artikel.csv, erstellt artikel.xml
-```
 
 > `csv_to_xml.py` setzt voraus, dass `DBinCSV.py` vorher gelaufen ist.
 
 ---
 
-### Option 1 – Tkinter-Hauptprogramm (Pflicht, lt. Lehrer)
+### Option 1 – Tkinter-Hauptprogramm (Pflichtteil)
 
-```bash
+# Zum starten
 python3 main.py
-```
 
 - Zwei getrennte Screens: **Login-Screen** → nach Anmelden → **Task-Screen**
 - Login-Screen: zentrierte weiße Karte auf blauem Hintergrund (wie Browser-Login)
@@ -114,9 +50,8 @@ python3 main.py
 
 ### Option 2 – Browser-GUI (Bonus)
 
-```bash
+# Zum Starten
 python3 BrowserGUI/app.py
-```
 
 Dann im Browser öffnen: **http://localhost:5000**
 
