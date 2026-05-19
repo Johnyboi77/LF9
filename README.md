@@ -88,7 +88,7 @@ python 05_csv_to_xml.py           # → liest artikel.csv, erstellt artikel.xml
 ### Option 1 – Tkinter-Hauptprogramm (Pflicht, lt. Lehrer)
 
 ```bash
-python main.py
+python3 main.py
 ```
 
 - Zwei getrennte Screens: **Login-Screen** → nach Anmelden → **Task-Screen**
@@ -102,7 +102,7 @@ python main.py
 ### Option 2 – Browser-GUI (Bonus)
 
 ```bash
-python BrowserGUI/app.py
+python3 BrowserGUI/app.py
 ```
 
 Dann im Browser öffnen: **http://localhost:5000**
