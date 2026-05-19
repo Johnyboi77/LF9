@@ -5,10 +5,10 @@
 # Bibliothek: mariadb (pip install mariadb)
 
 import mariadb                              # MariaDB-Bibliothek für DB-Zugriff
-from config import DB_LOCAL                 # Zugangsdaten aus zentraler Config
+from config import DB_SERVER                # Zugangsdaten (Schul-Server) aus zentraler Config
 
 try:                                        # Verbindungsaufbau mit Fehlerabfang
-    db = mariadb.connect(**DB_LOCAL)        # ** entpackt Dict zu einzelnen Parametern
+    db = mariadb.connect(**DB_SERVER)       # ** entpackt Dict zu einzelnen Parametern
 except mariadb.Error as fehler:             # Fängt mariadb-spezifische Fehler
     db = None                               # Bei Fehler: db auf None setzen
     print(f"Verbindung fehlgeschlagen: {fehler}")  # Fehlertext ausgeben

@@ -7,11 +7,11 @@
 
 import mariadb                              # MariaDB-Bibliothek für DB-Zugriff
 import csv                                  # CSV-Modul aus Python-Standardbibliothek
-from config import DB_LOCAL                 # Zugangsdaten aus zentraler Config
+from config import DB_SERVER                # Zugangsdaten (Schul-Server) aus zentraler Config
 
 # Verbindungsaufbau mit Fehlerabfang
 try:                                        # Fehlerbehandlung für Verbindungsaufbau
-    db = mariadb.connect(**DB_LOCAL)        # Verbindung über Daten aus config.py
+    db = mariadb.connect(**DB_SERVER)       # Verbindung über Daten aus config.py
 except mariadb.Error as fehler:             # Bei Verbindungs-Fehler:
     db = None                               # db auf None setzen
     print(f"Verbindung fehlgeschlagen: {fehler}")  # Fehlertext ausgeben

@@ -9,21 +9,22 @@ vereint in einem Login-Programm mit Rollen (RBAC).
 
 ```
 LF9/
-├── config.py                  ← Datenbankzugangsdaten (zentral, DRY-Prinzip)
+├── config.py                  ← Datenbankzugangsdaten: DB_LOCAL (lokal) + DB_SERVER (Schul-Server)
+├── dropdownmenu.py            ← Zentrale RBAC-Konfiguration: Abteilungen, TOOLS, Feature-Mapping
 ├── 01_ConnectionTest.py       ← Feature 1: DB-Verbindung testen
 ├── 02_print_SQL_Ausgabe.py    ← Feature 2: Mitarbeiter in der Konsole ausgeben
 ├── 03_DBinCSV.py              ← Feature 3: Artikel-Tabelle als CSV exportieren
 ├── 04_DBausgabeFenster.py     ← Feature 4: Kunden-Tabelle als Tkinter-Fenster
 ├── 05_csv_to_xml.py           ← Feature 5: artikel.csv → artikel.xml
 ├── 21_dropdown.py             ← Hauptprogramm: Tkinter-Login mit Rollen + Tool-Auswahl
+├── main.py                    ← Dasselbe wie 21_dropdown.py (Scaffold-Alias)
 ├── BrowserGUI/                ← Bonus: Browser-Darstellung (Flask)
 │   ├── app.py                 ← Flask-Webserver mit Login, RBAC, Downloads, Charts
 │   └── templates/
 │       ├── login.html         ← Login-Seite
 │       └── app.html           ← Haupt-App (Features + CEO-Diagramme)
-├── Datenbank/
-│   └── HeinerIT2025.sql       ← SQL-Dump zum Importieren
-└── config.py                  ← DB-Zugangsdaten (wird von allen Dateien verwendet)
+└── Datenbank/
+    └── HeinerIT2025.sql       ← SQL-Dump zum Importieren
 ```
 
 ---
@@ -53,16 +54,28 @@ sudo systemctl start mariadb
 sudo mariadb -u root -p heiner < Datenbank/HeinerIT2025.sql
 ```
 
-### 3. Zugangsdaten anpassen
+### 3. Zugangsdaten prüfen
 
-In [config.py](config.py) das `password` unter `DB_LOCAL` auf das eigene MariaDB-Root-Passwort setzen:
+In [config.py](config.py) sind zwei Verbindungsprofile hinterlegt:
 
+**`DB_SERVER`** – aktiv, wird von allen Dateien verwendet:
+```python
+DB_SERVER = {
+    "host":     "10.145.240.124",  # IP des Schul-Servers (aus Lehrer-PDF)
+    "port":     3306,
+    "user":     "root",
+    "password": "passwort",        # ← ggf. anpassen
+    "database": "HeinerIT2025"
+}
+```
+
+**`DB_LOCAL`** – nur als Fallback für lokale Entwicklung:
 ```python
 DB_LOCAL = {
     "host": "localhost",
     "port": 3306,
     "user": "root",
-    "password": "root123",   # ← hier anpassen
+    "password": "root123",         # ← bei lokaler Nutzung anpassen
     "database": "heiner"
 }
 ```
@@ -255,5 +268,5 @@ Der Browser-Bonus zeigt, wie die gleiche Aufgabe mit einem Web-Framework moderne
 | **DRY** (Don't Repeat Yourself) | `config.py` für alle DB-Zugangsdaten | Passwort an einer Stelle ändern, wirkt überall. |
 | **Separation of Concerns** | DB-Logik, GUI und Berechtigungen getrennt | Jede Funktion macht eine Sache – leichter zu erklären und zu warten. |
 | **Defensive Programmierung** | `if dbc is None`, `try/finally` | Externe Ressourcen (DB, Dateien) immer absichern – nie annehmen, dass alles funktioniert. |
-| **RBAC** (Role-Based Access Control) | `TOOLS`-Dict in `21_dropdown.py` und `BrowserGUI/app.py` | Industriestandard für Berechtigungen. Statt If-Else-Chaos eine zentrale Mapping-Tabelle. |
+| **RBAC** (Role-Based Access Control) | `TOOLS`-Dict in `dropdownmenu.py` (importiert von `main.py` und `BrowserGUI/app.py`) | Industriestandard für Berechtigungen. Statt If-Else-Chaos eine zentrale Mapping-Tabelle – nur noch an einer Stelle pflegen. |
 | **UTF-8 durchgängig** | DB-Verbindung, CSV-Export, XML-Ausgabe | Verhindert Umlaut-Probleme (`ü → ü`) über Systemgrenzen hinweg. |

@@ -26,18 +26,11 @@ import mariadb                                              # MariaDB-Datenbankz
 import csv                                                  # CSV in-memory schreiben
 import io                                                   # In-Memory-Streams (kein Dateisystem)
 import xml.etree.ElementTree as ET                          # XML aufbauen
-from config import DB_LOCAL                                 # Zentrale Zugangsdaten aus Root
+from config import DB_SERVER                                 # Zentrale Zugangsdaten (Schul-Server) aus Root
+from dropdownmenu import TOOLS_WEB as TOOLS                 # RBAC-Mapping (Abteilung → Feature-Keys) aus zentraler Konfiguration
 
 app = Flask(__name__)                                       # Flask-App erstellen
 app.secret_key = "lf9_heiner_2026_browsergui"              # Schlüssel für Session-Verschlüsselung
-
-# === RBAC-Mapping: Abteilung → erlaubte Features =====================================
-TOOLS = {
-    "Lager":             ["f2", "f4"],                      # SQL + DB-Tabelle
-    "Verwaltung":        ["f2", "f3", "f4"],                # + CSV-Download
-    "Marketing":         ["f2", "f4", "f5"],                # + XML-Download
-    "Geschäftsführung":  ["f2", "f3", "f4", "f5"],          # alle Features + Charts
-}
 
 # === SQL für CEO-Diagramme ===========================================================
 SQL_KUNDEN = """
@@ -66,7 +59,7 @@ SQL_ARTIKEL = """
 
 # === Hilfsfunktionen =================================================================
 def db_query(sql):                                          # SQL ausführen, Ergebnis zurückgeben
-    conn = mariadb.connect(**DB_LOCAL)                      # Verbindung aufbauen
+    conn = mariadb.connect(**DB_SERVER)                     # Verbindung aufbauen (Schul-Server)
     cur  = conn.cursor()                                    # Cursor erstellen
     cur.execute(sql)                                        # SQL ausführen
     cols = [d[0] for d in cur.description] if cur.description else []  # Spaltennamen
@@ -118,13 +111,13 @@ def feature1():
     status = None
     if request.method == "POST":
         try:
-            conn = mariadb.connect(**DB_LOCAL)              # Verbindung aufbauen
+            conn = mariadb.connect(**DB_SERVER)             # Verbindung aufbauen (Schul-Server)
             conn.ping()                                     # Ping senden
             conn.close()
             status = ("success", "✓  Verbindung erfolgreich")
         except mariadb.Error as e:
             status = ("error", f"✗  Fehlgeschlagen: {e}")
-    return render_template("app.html", **ctx("f1", status=status, db=DB_LOCAL))
+    return render_template("app.html", **ctx("f1", status=status, db=DB_SERVER))  # DB_SERVER-Daten für Anzeige
 
 # === Feature 2: SQL ausgeben =========================================================
 @app.route("/feature/2")

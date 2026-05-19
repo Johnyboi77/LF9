@@ -7,12 +7,12 @@
 import tkinter as tk                        # Tkinter-Hauptmodul für GUI-Fenster
 from tkinter import ttk                     # Themed Tkinter – für Treeview und Scrollbar
 import mariadb                              # MariaDB-Bibliothek für DB-Zugriff
-from config import DB_LOCAL                 # Zugangsdaten aus zentraler Config
+from config import DB_SERVER                # Zugangsdaten (Schul-Server) aus zentraler Config
 
 SQL = "SELECT KundenCode, Firma, Kontaktperson, Ort, Land FROM kunde"  # Abzufragende Spalten
 
 def read_from_database():                   # Liest Spaltennamen und Daten aus der DB
-    db = mariadb.connect(**DB_LOCAL)        # Verbindung aufbauen
+    db = mariadb.connect(**DB_SERVER)       # Verbindung aufbauen
     cur = db.cursor()                       # Cursor zum SQL-Ausführen erzeugen
     cur.execute(SQL)                        # SQL-Befehl senden
     spalten = [s[0] for s in cur.description]  # Spaltennamen aus Cursor-Metadaten

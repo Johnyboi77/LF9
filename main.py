@@ -9,28 +9,12 @@ import tkinter as tk                               # Tkinter-Hauptmodul für GUI
 from tkinter import ttk, messagebox, scrolledtext  # Widgets + Fehler-Dialoge + Textfeld
 import subprocess                                  # Startet andere Python-Dateien als Prozess
 import ast                                         # Sicheres Parsen von Python-Tupeln
-
-# 4 Abteilungen für das Login-Dropdown (lt. Codegerüst)
-mitarbeiter_options = ["Lager", "Verwaltung", "Marketing", "Geschäftsführung"]
-
-# Abteilung → erlaubte Dateien (lt. Aufgabe 2.2)
-TOOLS = {
-    "Lager":             ["02_print_SQL_Ausgabe.py", "04_DBausgabeFenster.py"],
-    "Verwaltung":        ["02_print_SQL_Ausgabe.py", "03_DBinCSV.py", "04_DBausgabeFenster.py"],
-    "Marketing":         ["02_print_SQL_Ausgabe.py", "04_DBausgabeFenster.py", "05_csv_to_xml.py"],
-    "Geschäftsführung":  ["02_print_SQL_Ausgabe.py", "03_DBinCSV.py", "04_DBausgabeFenster.py", "05_csv_to_xml.py"],
-}
-
-# Alle Features mit Anzeigename (für die Feature-Übersicht nach Login)
-ALLE_FEATURES = [
-    ("02_print_SQL_Ausgabe.py", "SQL-Ausgabe",  "Mitarbeiter anzeigen"),
-    ("03_DBinCSV.py",           "CSV-Export",   "Artikel als CSV exportieren"),
-    ("04_DBausgabeFenster.py",  "DB-Tabelle",   "Kunden im eigenen Fenster"),
-    ("05_csv_to_xml.py",        "XML-Export",   "CSV in XML konvertieren"),
-]
-
-# 04 öffnet ein eigenes Fenster – alle anderen geben Text aus
-FENSTER_TOOLS = {"04_DBausgabeFenster.py"}
+from dropdownmenu import (                         # Zentrale RBAC-Konfiguration (DRY)
+    mitarbeiter_options,                           # Abteilungsliste für Login-Dropdown
+    TOOLS,                                         # Abteilung → erlaubte Skript-Dateien
+    ALLE_FEATURES,                                 # Feature-Liste für Übersicht nach Login
+    FENSTER_TOOLS,                                 # Tools die ein eigenes Fenster öffnen
+)
 
 # Farbpalette – analog zur Browser-GUI (gleiche CSS-Variablen)
 HDR  = "#1e3a5f"   # Header-Hintergrund
@@ -77,6 +61,14 @@ def zeige_main(abt):
     # Feature-Liste auffrischen
     for widget in feat_frame.winfo_children():     # Alte Labels entfernen
         widget.destroy()
+
+    # Navigations-Abschnitt (für alle Abteilungen sichtbar, kein RBAC)
+    tk.Label(feat_frame, text="NAVIGATION", bg=SIDE,
+             fg="#4a6a8a", font=("Arial", 9, "bold")).pack(anchor="w", padx=16, pady=(14, 6))
+    tk.Button(feat_frame, text="  ⚡  Verbindung testen", bg=SIDE, fg=CARD,
+              font=("Arial", 11), relief="flat", anchor="w", width=18,
+              command=verbindung_testen).pack(anchor="w", padx=8, pady=3)
+
     tk.Label(feat_frame, text="FEATURES", bg=SIDE,
              fg="#4a6a8a", font=("Arial", 9, "bold")).pack(anchor="w", padx=16, pady=(14, 6))
     for datei, name, beschr in ALLE_FEATURES:      # Jedes Feature anzeigen
@@ -93,6 +85,13 @@ def zeige_main(abt):
 
     frame_main.place(relx=0, rely=0,               # Task-Screen einblenden
                      relwidth=1, relheight=1)
+
+# Führt den Verbindungstest (01_ConnectionTest.py) aus und zeigt das Ergebnis
+def verbindung_testen():
+    result = subprocess.run(
+        ["python", "01_ConnectionTest.py"], capture_output=True, text=True)
+    text = result.stdout or result.stderr or "(keine Ausgabe)"
+    zeige_ausgabe(text, ausgabe)
 
 # Startet das gewählte Tool – mit oder ohne eigenes Fenster
 def run_tool():
