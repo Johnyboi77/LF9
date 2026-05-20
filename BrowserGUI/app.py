@@ -83,53 +83,53 @@ def ctx(page, **extra):                                     # Template-Kontext z
 # === Login / Logout ==================================================================
 @app.route("/", methods=["GET", "POST"])                    # GET = Formular, POST = Login prüfen
 def login():
-    fehler = None
-    if request.method == "POST":
+    fehler = None                                           # Fehlermeldung initial leer
+    if request.method == "POST":                            # Formular abgeschickt?
         abt = request.form.get("abteilung", "")            # Abteilung aus Formular
         pw  = request.form.get("passwort", "")             # Passwort aus Formular
         if pw == abt and abt:                               # Passwort = Abteilungsname
             session["abteilung"] = abt                      # In Session speichern
             return redirect(url_for("dashboard"))           # → Dashboard
-        fehler = "Bitte versuche es erneut"
-    return render_template("login.html", fehler=fehler, abteilungen=mitarbeiter_options)
+        fehler = "Bitte versuche es erneut"                 # Falsches Passwort → Fehlermeldung setzen
+    return render_template("login.html", fehler=fehler, abteilungen=mitarbeiter_options)  # Login-Seite rendern
 
-@app.route("/logout")
+@app.route("/logout")                                       # Route: /logout
 def logout():
     session.clear()                                         # Session löschen
     return redirect(url_for("login"))                       # → Login
 
 # === Dashboard =======================================================================
-@app.route("/dashboard")
-@login_required
-def dashboard():
-    return render_template("app.html", **ctx("dashboard"))
+@app.route("/dashboard")                                    # Route: /dashboard (Startseite nach Login)
+@login_required                                             # Login-Schutz: nicht eingeloggt → Redirect zu /
+def dashboard():                                            # Dashboard anzeigen
+    return render_template("app.html", **ctx("dashboard")) # Template mit Kontext rendern
 
 # === Feature 1: Verbindung testen ====================================================
-@app.route("/feature/1", methods=["GET", "POST"])
-@login_required
-def feature1():
-    status = None
-    if request.method == "POST":
-        try:
+@app.route("/feature/1", methods=["GET", "POST"])           # Route: Verbindungstest
+@login_required                                             # Login-Schutz
+def feature1():                                             # Feature 1: Verbindungstest
+    status = None                                           # Status initial leer (kein POST)
+    if request.method == "POST":                            # Test-Button gedrückt?
+        try:                                                # Verbindungsversuch mit Fehlerabfang
             conn = mariadb.connect(**DB_SERVER)             # Verbindung aufbauen (Schul-Server)
             conn.ping()                                     # Ping senden
-            conn.close()
-            status = ("success", "✓  Verbindung erfolgreich")
-        except mariadb.Error as e:
-            status = ("error", f"✗  Fehlgeschlagen: {e}")
+            conn.close()                                    # Verbindung nach Ping schließen
+            status = ("success", "✓  Verbindung erfolgreich")   # Erfolg-Tuple für Template
+        except mariadb.Error as e:                          # Verbindungsfehler abfangen
+            status = ("error", f"✗  Fehlgeschlagen: {e}")  # Fehler-Tuple für Template
     return render_template("app.html", **ctx("f1", status=status, db=DB_SERVER))  # DB_SERVER-Daten für Anzeige
 
 # === Feature 2: SQL ausgeben =========================================================
-@app.route("/feature/2")
-@login_required
-def feature2():
+@app.route("/feature/2")                                    # Route: SQL-Ausgabe
+@login_required                                             # Login-Schutz
+def feature2():                                             # Feature 2: Mitarbeiter anzeigen
     cols, rows = db_query("SELECT * FROM personal")         # Alle Mitarbeiter abfragen
-    return render_template("app.html", **ctx("f2", cols=cols, rows=rows))
+    return render_template("app.html", **ctx("f2", cols=cols, rows=rows))  # Tabelle ins Template übergeben
 
 # === Feature 3: CSV-Download =========================================================
-@app.route("/feature/3", methods=["GET", "POST"])
-@login_required
-def feature3():
+@app.route("/feature/3", methods=["GET", "POST"])           # Route: CSV-Download
+@login_required                                             # Login-Schutz
+def feature3():                                             # Feature 3: Artikel als CSV downloaden
     if request.method == "POST":                            # Download-Button gedrückt
         cols, rows = db_query("SELECT * FROM artikel")     # Artikeldaten aus DB
         buf = io.StringIO()                                 # In-Memory-Puffer (kein Dateisystem)
@@ -142,58 +142,58 @@ def feature3():
             mimetype="text/csv",
             as_attachment=True,
             download_name="artikel.csv")                    # Dateiname im Browser
-    return render_template("app.html", **ctx("f3"))
+    return render_template("app.html", **ctx("f3"))         # GET: nur Download-Button anzeigen
 
 # === Feature 4: DB-Tabelle anzeigen ==================================================
-@app.route("/feature/4")
-@login_required
-def feature4():
+@app.route("/feature/4")                                    # Route: DB-Tabelle anzeigen
+@login_required                                             # Login-Schutz
+def feature4():                                             # Feature 4: Kunden-Tabelle im Browser
     cols, rows = db_query(
-        "SELECT KundenCode, Firma, Kontaktperson, Ort, Land FROM kunde")
-    return render_template("app.html", **ctx("f4", cols=cols, rows=rows))
+        "SELECT KundenCode, Firma, Kontaktperson, Ort, Land FROM kunde")  # Kunden-Daten aus DB holen
+    return render_template("app.html", **ctx("f4", cols=cols, rows=rows))  # Tabelle ins Template übergeben
 
 # === Feature 5: XML-Download (direkt aus DB, kein CSV nötig) =========================
-@app.route("/feature/5", methods=["GET", "POST"])
-@login_required
-def feature5():
+@app.route("/feature/5", methods=["GET", "POST"])           # Route: XML-Download
+@login_required                                             # Login-Schutz
+def feature5():                                             # Feature 5: Artikel als XML downloaden
     if request.method == "POST":                            # Download-Button gedrückt
         cols, rows = db_query("SELECT * FROM artikel")     # Direkt aus DB (kein CSV nötig)
         root_el = ET.Element("artikel_liste")               # XML-Wurzelelement
         for zeile in rows:                                  # Jede Zeile = ein <artikel>
-            eintrag = ET.SubElement(root_el, "artikel")
+            eintrag = ET.SubElement(root_el, "artikel")     # Neues <artikel>-Subelement
             for k, v in zip(cols, zeile):                   # Pro Spalte ein Subelement
-                ET.SubElement(eintrag, k).text = str(v) if v is not None else ""
-        baum = ET.ElementTree(root_el)
+                ET.SubElement(eintrag, k).text = str(v) if v is not None else ""  # Wert als Text
+        baum = ET.ElementTree(root_el)                      # ElementTree aus Wurzel bauen
         ET.indent(baum, space="  ")                         # Lesbar einrücken
-        buf = io.BytesIO()                                  # In-Memory-Puffer
-        baum.write(buf, encoding="utf-8", xml_declaration=True)
-        buf.seek(0)
+        buf = io.BytesIO()                                  # In-Memory-Puffer für XML-Bytes
+        baum.write(buf, encoding="utf-8", xml_declaration=True)  # XML in Puffer schreiben
+        buf.seek(0)                                         # Zurück an Puffer-Anfang
         return send_file(buf, mimetype="application/xml",
-                         as_attachment=True, download_name="artikel.xml")
-    return render_template("app.html", **ctx("f5"))
+                         as_attachment=True, download_name="artikel.xml")  # Als Download senden
+    return render_template("app.html", **ctx("f5"))         # GET: nur Download-Button anzeigen
 
 # === CEO-Chart-APIs (Plotly.js holt diese Daten per fetch()) =========================
-@app.route("/api/kunden")
-@login_required
-def api_kunden():
-    _, rows = db_query(SQL_KUNDEN)
+@app.route("/api/kunden")                                   # API-Route für Kunden-Donut-Chart
+@login_required                                             # Login-Schutz
+def api_kunden():                                           # Kunden-Umsatz als JSON für Plotly
+    _, rows = db_query(SQL_KUNDEN)                          # SQL ausführen (Spaltennamen nicht nötig)
     top = rows[:5]; rest = rows[5:]                         # Top 5 + Sonstige zusammenfassen
-    namen = [r[0] for r in top] + (["Sonstige"] if rest else [])
-    werte = [float(r[1]) for r in top] + ([float(sum(r[1] for r in rest))] if rest else [])
+    namen = [r[0] for r in top] + (["Sonstige"] if rest else [])  # Namen-Liste für Donut
+    werte = [float(r[1]) for r in top] + ([float(sum(r[1] for r in rest))] if rest else [])  # Umsatz-Liste
     return jsonify(namen=namen, werte=werte)                # JSON für Plotly
 
-@app.route("/api/monat")
-@login_required
-def api_monat():
-    _, rows = db_query(SQL_MONAT)
-    return jsonify(monate=[r[0] for r in rows],
+@app.route("/api/monat")                                    # API-Route für Monats-Balkendiagramm
+@login_required                                             # Login-Schutz
+def api_monat():                                            # Monatsumsatz 2025 als JSON für Plotly
+    _, rows = db_query(SQL_MONAT)                           # SQL ausführen
+    return jsonify(monate=[r[0] for r in rows],             # Monate + Umsätze als JSON
                    umsaetze=[float(r[1]) for r in rows])
 
-@app.route("/api/artikel")
-@login_required
-def api_artikel():
-    _, rows = db_query(SQL_ARTIKEL)
-    return jsonify(artikel=[r[0] for r in rows],
+@app.route("/api/artikel")                                  # API-Route für Top-10-Artikel-Diagramm
+@login_required                                             # Login-Schutz
+def api_artikel():                                          # Top-10-Artikel als JSON für Plotly
+    _, rows = db_query(SQL_ARTIKEL)                         # SQL ausführen
+    return jsonify(artikel=[r[0] for r in rows],            # Artikelnamen + Umsätze als JSON
                    umsaetze=[float(r[1]) for r in rows])
 
 # === Start ===========================================================================
